@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 //수정
-const BASE_URL = 'http://34.210.11.121:8080';
+const BASE_URL = '';
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,

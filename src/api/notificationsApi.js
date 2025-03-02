@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://34.210.11.121:8080'; // 알림 서비스 포트로 변경
+const BASE_URL = ''; // 알림 서비스 포트로 변경
 
 const axiosInstance = axios.create({
     baseURL: BASE_URL,
@@ -89,7 +89,10 @@ const notificationApi = {
             return null;
         }
 
-        const ws = new WebSocket(`ws://${BASE_URL.replace('http://', '')}/ws/alerts?email=${userEmail}`);
+        // 프로토콜 자동 결정 (HTTPS일 경우 WSS 사용)
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const host = window.location.host;
+        const ws = new WebSocket(`${wsProtocol}//${host}/ws/alerts?email=${userEmail}`);
         
         ws.onopen = () => {
             console.log('✅ 알림 WebSocket 연결 성공');

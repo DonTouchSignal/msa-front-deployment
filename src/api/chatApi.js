@@ -2,7 +2,7 @@ import axios from 'axios';
 import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
 
-const BASE_URL = 'http://34.210.11.121:8080';
+const BASE_URL = '';
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
@@ -56,7 +56,7 @@ class ChatApi {
     const authUser = localStorage.getItem('X-Auth-User');
 
     const client = new Client({
-      webSocketFactory: () => new SockJS(`${BASE_URL}/ws`),
+      webSocketFactory: () => new SockJS('/ws'),
       debug: function (str) {
         console.log('STOMP:', str);
       },

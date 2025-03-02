@@ -1,7 +1,7 @@
 import axios from "axios";
 import { throttle } from "lodash";
 
-const BASE_URL = "http://34.210.11.121:8080/asset"; // 백엔드 API URL
+const BASE_URL = "/asset"; // 백엔드 API URL
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
@@ -164,24 +164,23 @@ const assetApi = {
   }, 2000), // 2초 간격 제한
   
   // WebSocket 연결 - 주식 실시간 시세
-  //  수정
-  // assetApi.js 파일의 웹소켓 관련 부분만 수정
-
-// WebSocket 연결 - 주식 실시간 시세
   subscribeToStockPrice: (symbol, onMessage) => {
-    // 웹소켓 주소를 백엔드 포트(8080)로 수정
-    const socket = new WebSocket(`ws://34.210.11.121:8080/ws/stocks`);
+    // 프로토콜 자동 결정 (HTTPS일 경우 WSS 사용)
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const host = window.location.host;
+    const socket = new WebSocket(`${wsProtocol}//${host}/ws/stocks`);
+    
     let isSubscribed = false;
     
     socket.onopen = () => {
-      console.log(`✅ WebSocket 연결 성공 - ${symbol}`);
-      // 연결 후 구독 메시지 전송
-      const subscribeMsg = JSON.stringify({
-        type: 'subscribe',
-        symbol: symbol
-      });
-      socket.send(subscribeMsg);
-      console.log(`📨 구독 메시지 전송: ${subscribeMsg}`);
+        console.log(`✅ WebSocket 연결 성공 - ${symbol}`);
+        // 연결 후 구독 메시지 전송
+        const subscribeMsg = JSON.stringify({
+            type: 'subscribe',
+            symbol: symbol
+        });
+        socket.send(subscribeMsg);
+        console.log(`📨 구독 메시지 전송: ${subscribeMsg}`);
     };
     
     socket.onmessage = (event) => {
@@ -261,7 +260,10 @@ const assetApi = {
       return null;
     }
     
-    const socket = new WebSocket(`ws://34.210.11.121:8080/ws/alerts?email=${userEmail}`);
+    // 프로토콜 자동 결정 (HTTPS일 경우 WSS 사용)
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const host = window.location.host;
+    const socket = new WebSocket(`${wsProtocol}//${host}/ws/alerts?email=${userEmail}`);
     
     socket.onopen = () => {
       console.log('✅ 알림 WebSocket 연결 성공');
