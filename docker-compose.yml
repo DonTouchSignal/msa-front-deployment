@@ -1,0 +1,17 @@
+version: '3.7'
+
+services:
+  frontend:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "80:80"
+    networks:
+      - msa-network
+
+networks:
+  msa-network:
+    driver: bridge

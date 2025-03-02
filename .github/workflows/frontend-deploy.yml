@@ -1,0 +1,69 @@
+name: Deploy Frontend
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '**'
+      - '.github/workflows/frontend-deploy.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: GitHub Repository 코드 체크아웃
+        uses: actions/checkout@v4
+
+      # 필요한 경우 환경 변수 파일 생성
+      # - name: 환경 변수 파일 생성
+      #   run: |
+      #     echo "${{ secrets.REACT_ENV_CONFIG }}" > .env
+      #     echo "환경 변수 파일 생성 완료"
+
+      # EC2로 파일 업로드
+      - name: EC2에 파일 업로드
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          source: ".,!node_modules,!.git"
+          target: "/home/${{ secrets.EC2_USER }}/app/frontend"
+          strip_components: 0
+
+      # EC2에서 서비스 실행
+      - name: EC2에서 서비스 실행
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          script_stop: true
+          script: |
+            # Docker 및 Docker Compose 설치 확인
+            if ! command -v docker &> /dev/null; then
+              echo "Docker 설치 중..."
+              sudo yum update -y
+              sudo amazon-linux-extras install docker -y
+              sudo service docker start
+              sudo usermod -a -G docker $USER
+            fi
+            
+            if ! command -v docker-compose &> /dev/null; then
+              echo "Docker Compose 설치 중..."
+              sudo curl -L "https://github.com/docker/compose/releases/download/v2.18.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+              sudo chmod +x /usr/local/bin/docker-compose
+            fi
+            
+            # 서비스 배포 및 실행
+            cd /home/$USER/app/frontend
+            
+            # 이전 서비스 중지 및 새 서비스 시작
+            docker-compose down
+            docker-compose up -d --build
+            
+            # 로그 확인
+            sleep 5
+            docker ps
+            CONTAINER_FRONTEND=$(docker ps --format '{{.Names}}' | grep frontend)
+            docker logs $CONTAINER_FRONTEND || true

@@ -1,0 +1,49 @@
+.chat-container {
+  height: 400px;
+  overflow-y: auto;
+  background-color: #1a1a1a;
+  padding: 10px;
+  border-radius: 8px;
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #888 #1a1a1a; /* Firefox */
+}
+
+.chat-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-container::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-radius: 4px;
+}
+
+.chat-container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.chat-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* 새 메시지가 추가될 때 부드러운 스크롤 효과 */
+.chat-container {
+  scroll-behavior: smooth;
+}
+
+/* 메시지 컨테이너에 fade-in 효과 추가 */
+.message-container {
+  animation: fadeIn 0.3s ease-in-out;
+  margin-bottom: 6px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+} 
