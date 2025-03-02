@@ -6,6 +6,8 @@ COPY . .
 
 RUN npm install
 
+RUN npm install date-fns
+
 RUN npm run build
 
 FROM nginx:alpine
